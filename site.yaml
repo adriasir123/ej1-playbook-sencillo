@@ -1,0 +1,75 @@
+- hosts: nodo1
+  become: true
+  tasks:
+    - name: Creando usuario adrianj...
+      user:
+        name: adrianj
+        password: '$6$Rjn7CUlYJXM8Fvrk$4r/qu2Q6Abiq4iGJjOW2RtclK14AyB9/3va/ZWu3oPIjIo10sNPgoyM6/sthvocwux.7hXFk/O8QpNNUW3Xsr1'
+        # He usado mkpasswd --method=sha-512
+        # en plano: 1234
+
+    - name: Descargando Wordpress...
+      get_url:
+        url: https://wordpress.org/latest.zip
+        dest: /tmp
+
+    - name: Descompresión
+      block:
+       - name: Instalando unzip...
+         become_user: root
+         apt:
+           pkg:
+           - unzip
+       - name: Descomprimiendo Wordpress en el home de adrianj...
+         unarchive:
+           src: /tmp/wordpress-5.8.1.zip
+           dest: /home/adrianj
+           remote_src: yes
+
+    - name: Instalando MariaDB...
+      apt:
+        pkg:
+        - mariadb-server
+
+    - name: Instalar python3-pip + pymysql + crear BD
+      block:
+       - name: Instalando python3-pip...
+         apt:
+           pkg:
+           - python3-pip
+       - name: Instalando pymysql...
+         pip:
+           name: pymysql
+       - name: Creando la base de datos adrian_wordpress...
+         mysql_db:
+           login_unix_socket: /var/run/mysqld/mysqld.sock
+           name: adrian_wordpress
+           state: present
+
+#Falta tarea6 aquí
+
+    - name: Git + directorio vacío + repo
+      block:
+       - name: Instalando git...
+         apt:
+           pkg:
+           - git
+       - name: Creando un directorio vacío para el repo...
+         file:
+           path: /home/adrianj/repo
+           state: directory
+       - name: Clonando repo al home de adrianj...
+         git:
+           repo: https://github.com/josedom24/ansible_ejemplos.git
+           dest: /home/adrianj/repo
+
+
+
+
+#    - name: create user mysql wordpress
+#      mysql_user: name={{bd_user}} host={{ item }} password={{bd_pass}} priv={{bd_name}}.*:ALL,GRANT
+#      with_items:
+#        - localhost
+
+          
+    

@@ -1,0 +1,1 @@
+nodo1 ansible_ssh_host=192.168.121.229 ansible_ssh_user=vagrant ansible_ssh_private_key_file=~/vagrant/ej1-playbook-sencillo/.vagrant/machines/vm1/libvirt/private_key
